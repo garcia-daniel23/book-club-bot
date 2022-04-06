@@ -7,15 +7,17 @@ import (
 )
 
 var (
-	Token     string
-	BotPrefix string
+	Token             string
+	BotPrefix         string
+	GoogleBooksAPIKey string
 
 	config *configStruct
 )
 
 type configStruct struct {
-	Token     string `json : "Token"`
-	BotPrefix string `json : "BotPrefix"`
+	Token             string `json : "Token"`
+	BotPrefix         string `json : "BotPrefix"`
+	GoogleBooksAPIKey string `json : GoogleBooksAPIKey`
 }
 
 func ReadConfig() error {
@@ -36,6 +38,7 @@ func ReadConfig() error {
 
 	Token = config.Token
 	BotPrefix = config.BotPrefix
+	GoogleBooksAPIKey = config.GoogleBooksAPIKey
 
 	return nil
 }

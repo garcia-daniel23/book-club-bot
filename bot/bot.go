@@ -2,16 +2,26 @@ package bot
 
 import (
 	"book-club-bot/config"
+	"context"
 	"fmt"
 	"os"
 	"os/signal"
+	"regexp"
+	"strings"
 
 	"github.com/bwmarrin/discordgo"
+	books "google.golang.org/api/books/v1"
 )
 
 var (
-	BotId string
-	goBot *discordgo.Session
+	BotId        string
+	goBot        *discordgo.Session
+	booksService *books.Service
+)
+
+const (
+	baseCommand = "!"
+	getVol      = "getBook"
 )
 
 func Start() {
@@ -28,10 +38,16 @@ func Start() {
 		return
 	}
 
+	ctx := context.Background()
+	booksService, err = books.NewService(ctx)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
 	BotId = u.ID
 
 	goBot.AddHandler(messageHandler)
-	goBot.AddHandler(requestHandler)
+	goBot.AddHandler(googleBooksHandler)
 
 	err = goBot.Open()
 	if err != nil {
@@ -56,9 +72,35 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 }
 
-func requestHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
+func googleBooksHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author.ID == BotId {
 		return
 	}
-	_, _ = s.ChannelMessageSend(m.ChannelID, "test")
+
+	command, body := parseCommand(m.Content)
+	if command == getVol {
+		_, _ = s.ChannelMessageSend(m.ChannelID, "Getting book")
+	} else {
+		_, _ = s.ChannelMessageSend(m.ChannelID, "Not a valid command")
+	}
+	fmt.Println(body)
+
+}
+
+func parseCommand(messageContent string) (parsedCommand string, body string) {
+	splitMessage := strings.Split(messageContent, " ")
+
+	match, err := regexp.MatchString("![A-z]+", splitMessage[0])
+	if err != nil {
+		fmt.Println(err.Error())
+		return "", ""
+	}
+
+	if match {
+		command := splitMessage[0][1:]
+		body := strings.Join(splitMessage[1:], " ")
+		return command, body
+	}
+
+	return
 }
