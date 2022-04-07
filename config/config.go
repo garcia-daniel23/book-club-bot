@@ -30,7 +30,6 @@ func ReadConfig() error {
 	fmt.Println("Successfully read config file.")
 
 	err = json.Unmarshal(file, &config)
-
 	if err != nil {
 		fmt.Println(err.Error())
 		return err

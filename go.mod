@@ -4,6 +4,7 @@ go 1.18
 
 require (
 	github.com/bwmarrin/discordgo v0.24.0
+	github.com/paul-mannino/go-fuzzywuzzy v0.0.0-20200127021948-54652b135d0e
 	google.golang.org/api v0.74.0
 )
 
